@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ topic.SectionSubject }} {% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home' %}">OpenForum</a></li>
+<li class="breadcrumb-item"><a href="{% url 'board_topics' topic.board.pk %}">{{ topic.board.ForumTitile }}</a></li>
+<li class="breadcrumb-item">{{ topic.SectionSubject }}</li>
+<li class="breadcrumb-item active">Post reply</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">{{ topic.SectionSubject }}</h1>
+    
+    <!-- Reply Form -->
+         <div class="card-body">
+             <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                {% include 'includes/form.html' %}
+                <button type="submit" class="btn btn-success">Post the Reply</button>
+            </form>
+        </div>
+     
+    <!-- Posts Section -->
+    <h2 class="my-4">Discussion</h2>
+    {% for post in topic.comt.all %}
+<div class="container my-4">
+    <div class="card shadow-lg mx-auto" style="max-width: 800px;">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <!-- User Avatar -->
+                <div class="col-auto">
+                    <img src="{% static 'img/user.png' %}" alt="{{ post.created_by.username }}" class="rounded-circle img-fluid" style="width: 60px; height: 60px; object-fit: cover;">
+                </div>
+
+                <!-- Post Content -->
+                <div class="col">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-dark fs-5">{{ post.created_by.username }}</strong>
+                        <small class="text-muted">{{ post.created_dt }}</small>
+                    </div>
+                    <p class="text-muted mb-3">{{ post.massg }}</p>
+
+                    <!-- Edit Button for Author -->
+                    {% if post.created_by == user %}
+                    <div class="text-end">
+                        <a href="{% url 'edit_post' post.section.board.pk post.section.pk post.pk %}" class="btn btn-outline-primary btn-sm" role="button">
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

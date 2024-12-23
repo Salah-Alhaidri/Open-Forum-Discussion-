@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ board.ForumTitile }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'home' %}">OpenForum</a></li>
+<li class="breadcrumb-item active">{{ board.ForumTitile }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <main class="col-lg-10 col-md-9 col-sm-12 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>{{ board.ForumTitile }}</h2>
+            <a href="{% url 'new_topic' board.pk %}" class="btn btn-primary">New Section</a>
+        </div>
+
+        <!-- Topics as Sections -->
+        {% for topic in topics %}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                <h5 class="mb-0">
+                    <a href="{% url 'topic_posts' board.pk topic.pk %}" class="text-decoration-none text-dark">
+                        {{ topic.SectionSubject }}
+                    </a>
+                </h5>
+                <span class="badge bg-primary text-white">{{ topic.comments }} Comments</span>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Created by:</strong> {{ topic.created_by.username }}</p>
+                <p class="mb-1"><strong>Views:</strong> {{ topic.views }}</p>
+                <p class="mb-0 text-muted"><small>Created on {{ topic.created_dt }}</small></p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if topics.has_other_pages %}
+        <nav aria-label="Topics pagination" class="mb-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                {% if topics.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ topics.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for num in topics.paginator.page_range %}
+                {% if num >= topics.number|add:-2 and num <= topics.number|add:2 %}
+                <li class="page-item {% if num == topics.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                <!-- Next Button -->
+                {% if topics.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ topics.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="col-lg-2 col-md-3 col-sm-12 ">
+        <div class="bg-light border rounded p-2 sticky-top overflow-auto" style="top: 1rem; max-width: 220px;">
+            <h5 class="text-uppercase text-center mb-2">Recent Boards</h5>
+            <ul class="list-group list-group-flush mb-3">
+                {% for b in boards|slice:":5" %}
+                <li class="list-group-item px-2 py-1">
+                    <a href="{% url 'board_topics' b.pk %}" 
+                       class="text-decoration-none {% if b.pk == board.pk %}text-primary fw-bold{% else %}text-dark{% endif %}">
+                        <i class="fas fa-comments me-1"></i>{{ b.ForumTitile }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'home' %}" class="btn btn-sm btn-outline-primary w-100">More Boards</a>
+        </div>
+    </aside>
+</div>
+{% endblock %}

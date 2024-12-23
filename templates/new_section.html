@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Start a New Topic{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'board_topics' board.pk %}">{{ board.ForumTitile }}</a></li>
+  <li class="breadcrumb-item active">New topic</li>
+{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 10vh;">
+  <div class="col-lg-6 col-md-8 col-sm-12">
+    <div class="card shadow-lg p-4">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">Add New Section</h3>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include 'includes/form.html' %}
+          <button type="submit" class="btn btn-success w-100">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

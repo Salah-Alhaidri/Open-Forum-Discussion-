@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Boards{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">OpenForum</li>
+{% endblock %}
+
+{% block content %}
+<!-- Responsive Grid Layout -->
+<div class="container">
+  
+  <div class="row g-4">
+    {% for board in boards %}
+    <div class="col-md-4">
+        <div class="card h-100 position-relative">
+            <!-- Board Icon -->
+            <div class="position-absolute top-0 end-0 p-2">
+              <img src="{{ board.ForumImage.url }}" alt="{{ board.ForumTitile }} Icon" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+            </div>
+            
+            <div class="card-body d-flex flex-column">
+                <!-- Board Name -->
+                <h5 class="card-title">
+                    <a href="{% url 'board_topics' board.pk %}" class="text-decoration-none text-primary">{{ board.ForumTitile }}</a>
+                </h5>
+                <!-- Board Description -->
+                <p class="card-text text-muted">{{ board.ForumDescription }}</p>
+                <!-- Post and Topic Counts -->
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between text-muted">
+                        <span>Comment: {{ board.gpc }}</span>
+                        <span>Topics: {{ board.gtc }}</span>
+                    </div>
+                    <!-- Last Post -->
+                    {% with post=board.glp %}
+                    <div class="mt-2">
+                        {% if post %}
+                            <small>Last Comment: <strong>{{ post.created_by.username }}</strong>, {{ post.created_dt }}</small>
+                        {% else %}
+                            <small>No Comment</small>
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<div class="d-flex justify-content-center mt-4">
+    <nav aria-label="Boards pagination">
+        <ul class="pagination">
+            <!-- Previous Button -->
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&laquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+            <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&raquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    
+</div>
+
+{% endif %}
+{% endblock %}
